@@ -1,0 +1,69 @@
+#include <iostream>
+#include <Windows.h>
+#include <process.h>
+
+using namespace std;
+
+const char MutexName[] = "TEST_MUTEX";
+
+/* Program 1 */
+
+//int main() 
+//{
+//    HANDLE mutex = CreateMutex(NULL, true, MutexName);
+//
+//    cout << "Mutex created, press any key to release" << endl;
+//
+//    char c = ' ';
+//    cin >> c;
+//
+//    ReleaseMutex(mutex);
+//
+//    cout << "Mutex release" << endl;
+//
+//    CloseHandle(mutex);
+//
+//    system("pause");
+//
+//    return 0;
+//}
+
+/* Program 2 */
+
+int main()
+{
+    HANDLE mutex = OpenMutex(MUTEX_ALL_ACCESS, true, MutexName);
+    if(mutex == NULL)
+    {
+        cout << "Open mutex failed" << endl;
+        system("pause");
+        return -1;
+    }
+
+    cout << "Waiting for \"" << MutexName << "\" to release" << endl;
+
+    DWORD dwResult = WaitForSingleObject(mutex, 1000 * 200);
+
+    switch(dwResult)
+    {
+        case WAIT_ABANDONED:
+        cout << "WAIT_ABANDONED" << endl;
+        break;
+        
+        case WAIT_OBJECT_0:
+        cout << "Mutex released" << endl;
+        break;
+
+        case WAIT_TIMEOUT:
+        cout << "WAIT_TIMEOUT" << endl;
+        break;
+
+        default:
+        break;
+    }
+
+    CloseHandle(mutex);
+
+    system("pause");
+    return 0;
+}

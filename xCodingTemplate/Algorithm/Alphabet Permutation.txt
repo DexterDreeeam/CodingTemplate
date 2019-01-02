@@ -1,0 +1,51 @@
+//×ÖÄ¸×ÖµäĞòÈ«ÅÅÁĞ
+
+#include <iostream>
+
+using namespace std;
+
+typedef long long int ll;
+
+void output(char d[], int n)
+{
+	for (int i = 0; i != n; ++i)
+		cout << d[i];
+	cout << " ";
+}
+
+void swap(char &x, char &y)
+{
+	char t = x;
+	x = y;
+	y = t;
+}
+
+void perm(char d[], int n, int j) {
+	if (j > n - 1)
+		cout << "error";
+	else if (j == n - 1)
+		output(d, n);
+	else
+		perm(d, n, j + 1);
+
+	for (int i = j + 1; i != n; ++i) {
+		swap(d[j], d[i]);
+		perm(d, n, j + 1);
+		swap(d[j], d[i]);
+	}
+}
+
+int main()
+{
+	char a[] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+		'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+	int n;
+	cout << "ÇëÊäÈën:\n";
+	cin >> n;
+	perm(a, n, 0);
+	cout << endl;
+	
+	system("pause");
+	return 0;
+
+}

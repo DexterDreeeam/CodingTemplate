@@ -1,0 +1,78 @@
+//TCP_Socket
+
+//服务器端 Server
+#include <winsock.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <iostream>
+#include <string>
+#pragma comment(lib, "ws2_32.lib")
+//显式加载 套接字 库
+//winsocket-32bit
+
+using namespace std;
+
+int main() {
+	//初始化套接字库——WSA startup
+	WSADATA data;
+	//结构体对象
+	WORD v = MAKEWORD(2, 0); 
+	//版本信息
+	WSAStartup(v, &data);
+	//初始化
+
+	//1.创建套接字 socket 2个  一个用于本机socket，一个用于接收客户端socket
+	SOCKET sS, sC; 
+	//Server Socket, Client Socket
+	sS = socket(AF_INET, SOCK_STREAM, 0); 
+	//ipv4, stream类型
+	sockaddr_in addrS, addrC; 
+	//Server地址 Client地址
+	addrS.sin_family = AF_INET; 
+	//设置为ipv4
+	addrS.sin_port = htons(75);
+	//设置端口 htons()转换为ushort
+	//设置Server地址
+	addrS.sin_addr.S_un.S_addr = INADDR_ANY;
+	//任何IP可以接入
+
+	//2.socket绑定本地地址和端口
+	::bind(sS, (sockaddr*)&addrS, sizeof(addrS));
+
+	//3.将socket设置为监听状态
+	listen(sS, 5);
+
+	cout << "== Server Start ==" << endl;
+
+	while (1) {
+		//4.接收消息，返回一个从Client返回的socket
+		int size = sizeof(addrC);
+		sC = accept(sS, (sockaddr*)&addrC, &size);
+		//接收Client的请求
+
+		if (sC != NULL) {
+			//5.使用sC进行通讯
+			cout << "IP:" << inet_ntoa(addrC.sin_addr) << "已连接。" << endl;
+			//inet_ntoa转字符串
+			char str[] = "Hello Client, I'm Server.";
+			send(sC, str, sizeof(str), 0);
+			//将str发送给Client
+		}
+		//6.关闭socket
+		closesocket(sS);
+		closesocket(sC);
+		WSACleanup();
+		//清空资源
+
+		string s;
+		if (cin >> s) {
+			return 0;
+		}
+		else {
+			::Sleep(100);
+		}
+	}
+
+	system("pause");
+	return 0;
+}

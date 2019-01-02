@@ -1,0 +1,71 @@
+#include <iostream>
+#include <Windows.h>
+#include <process.h>
+
+using namespace std;
+
+SRWLOCK srwLock;
+HANDLE mutex;
+
+unsigned __stdcall ThreadWriter(void * pM)
+{
+    AcquireSRWLockExclusive(&srwLock);
+
+        WaitForSingleObject(mutex, INFINITE);
+        cout << "Wirter begins to write ..." << endl;
+        ReleaseMutex(mutex);
+
+    Sleep(3000); //Simulate Writing
+
+        WaitForSingleObject(mutex, INFINITE);
+        cout << "Writer finishes writing" << endl;
+        ReleaseMutex(mutex);
+
+    ReleaseSRWLockExclusive(&srwLock);
+
+    return 0;
+}
+
+unsigned __stdcall ThreadReader(void * pM)
+{
+    AcquireSRWLockShared(&srwLock);
+
+        WaitForSingleObject(mutex, INFINITE);
+        cout << "Reader \"" << GetCurrentThreadId() << "\" begins to read ..." << endl;
+        ReleaseMutex(mutex);
+
+    Sleep(rand() % 1000); //Simulate Reading
+        
+        WaitForSingleObject(mutex, INFINITE);
+        cout << "Reader \"" << GetCurrentThreadId() << "\" finishes reading" << endl;
+        ReleaseMutex(mutex);
+
+    ReleaseSRWLockShared(&srwLock);
+
+    return 0;
+}
+
+int main()
+{
+    mutex = CreateMutex(NULL, false, NULL); //print mutex lock
+
+    InitializeSRWLock(&srwLock); //rwLock
+
+    HANDLE hThreads[10];
+    for(int i = 0; i != 3; ++i)
+    {
+        hThreads[i] = (HANDLE)_beginthreadex(NULL, 0, ThreadReader, NULL, 0, NULL);
+    }
+    hThreads[3] = (HANDLE)_beginthreadex(NULL, 00, ThreadWriter, NULL, 0, NULL);
+    for (int i = 4; i != 10; ++i)
+    {
+        hThreads[i] = (HANDLE)_beginthreadex(NULL, 0, ThreadReader, NULL, 0, NULL);
+    }
+
+    WaitForMultipleObjects(10, hThreads, true, INFINITE);
+
+    cout << "All threads done" << endl;
+
+    system("pause");
+    return 0;
+}

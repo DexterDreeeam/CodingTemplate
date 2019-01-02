@@ -1,0 +1,47 @@
+//UDP_Socket
+
+//Server
+#include <winsock.h>
+#include <windows.h>
+#include <iostream>
+#include <string>
+#pragma comment(lib,"ws2_32.lib")
+
+using namespace std;
+
+int main() {
+	//初始化套接字库——WSA startup
+	WSADATA data;
+	WORD v = MAKEWORD(2, 0);
+	WSAStartup(v, &data);
+
+	//1.创建socket
+	SOCKET sS = socket(AF_INET, SOCK_DGRAM, 0); 
+	// TCP->STREAM  UDP->DATAGRAM
+
+	//2.绑定socket和地址与端口
+	sockaddr_in addrS, addrC;
+	addrS.sin_family = AF_INET;
+	addrS.sin_port = htons(75);
+	addrS.sin_addr.S_un.S_addr = INADDR_ANY;
+	::bind(sS, (sockaddr*)&addrS, sizeof(addrS));
+
+	cout << "Server Start." << endl;
+
+	char buff[30] = "";
+	while (1) {
+		int size = sizeof(addrC);
+		//3.接受消息  TCP使用recv  UDP使用recvfrom
+		if (recvfrom(sS, buff, 30, 0, (sockaddr*)&addrC, &size) != 0) {
+			cout << "IP: " << inet_ntoa(addrC.sin_addr) << "已连接." << endl;
+			cout << buff << endl;
+			//4.发送消息  TCP使用send  UDP使用sendto
+			char str[] = "Hello Client, I'm Server.";
+			sendto(sS, str, sizeof(str), 0, (sockaddr*)&addrC, size);
+		}
+	}
+	closesocket(sS);
+	WSACleanup();
+
+	return 0;
+}

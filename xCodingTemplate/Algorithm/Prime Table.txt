@@ -1,0 +1,33 @@
+//ËØÊý±í xCpp
+
+#include <memory.h>
+#include <iostream>
+
+using namespace std;
+
+typedef size_t __size_t;
+#define __Max__ (100)
+bool isPrime[__Max__ + 1];
+
+int main() {
+
+	//Init Prime Group
+	memset(isPrime, true, sizeof(bool) * (__Max__ + 1));
+	isPrime[0] = false;
+	isPrime[1] = false;
+	for (__size_t i = 2; i != __Max__ + 1; ++i) {
+		if (isPrime[i] == false) continue;
+		for (__size_t j = 2; j * i <= __Max__; ++j)
+			isPrime[j * i] = false;
+	}
+	//End Init
+
+	for (__size_t i = 0; i != __Max__ + 1; ++i) {
+		if (isPrime[i])
+			cout << i << " is a prime. " << endl;
+		else
+			cout << i << " is not a prime. " << endl;
+	}
+
+	return 0;
+}

@@ -1,0 +1,22 @@
+//最大公约数与最小公倍数 xCpp
+
+#include <iostream>
+using namespace std;
+
+template<typename _T>
+_T GreatestCommonDivisor(_T a, _T b) {
+	return b == 0 ? a : GreatestCommonDivisor(b, a % b);
+}
+
+template<typename _T>
+inline _T LeastCommonMultiple(_T a, _T b) {
+	return a * b / GreatestCommonDivisor(a, b);
+}
+
+#define GCD GreatestCommonDivisor
+#define LCM LeastCommonMultiple
+
+int main() {
+	cout << LCM(6, 80) << endl;
+		return 0;
+}

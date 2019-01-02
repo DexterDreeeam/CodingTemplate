@@ -1,0 +1,32 @@
+//ÅÅÁÐ×éºÏ xCpp
+
+#include <iostream>
+using namespace std;
+
+template<typename _T>
+_T A(_T _bot, _T _top) {
+	if (_bot <= 0 || _top < 0 || _top > _bot)
+		return -1;
+	_T rst = 1;
+	for (_T i = 0; i != _top; ++i)
+		rst *= _bot - i;
+	return rst;
+}
+
+template<typename _T>
+_T C(_T _bot, _T _top) {
+	if (_bot <= 0 || _top < 0 || _top > _bot)
+		return -1;
+	if (!_top)
+		return 1;
+	return A(_bot, _top) / A(_top, _top);
+}
+
+
+int main() {
+	
+	cout << A(4, 2) << endl;
+	cout << C(4, 0) << endl;
+
+	return 0;
+}

@@ -1,0 +1,41 @@
+#include <iostream>
+#include <Windows.h>
+#include <process.h>
+
+using namespace std;
+
+HANDLE hSema;
+
+unsigned __stdcall ThreadFun(void * pM)
+{
+    int nThreadNum = *(int *)pM;
+    cout << "Thread Number " << nThreadNum << endl;
+
+    ReleaseSemaphore(hSema, 1, NULL); // V operation
+
+    return 0;
+}
+
+int main()
+{
+    HANDLE hThreads[10];
+
+    //prmt 1 : secure parameter
+    //prmt 2 : initial resource quantity occupied
+    //prmt 3 : most concurrent quantity
+    //prmt 4 : semaphore name
+    hSema = CreateSemaphore(NULL, 0, 1, NULL);
+
+    for(int i = 0; i != 10; ++i)
+    {
+        hThreads[i] = (HANDLE)_beginthreadex(NULL, 0, ThreadFun, (void*)&i, 0, NULL);
+        WaitForSingleObject(hSema, INFINITE); // P operation
+    }
+    WaitForMultipleObjects(10, hThreads, true, INFINITE);
+
+    cout << "All Threads are done" << endl;
+    CloseHandle(hSema);
+
+    system("pause");
+    return 0;
+}

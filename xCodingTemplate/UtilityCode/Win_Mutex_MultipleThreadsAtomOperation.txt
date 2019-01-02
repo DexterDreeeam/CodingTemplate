@@ -1,0 +1,50 @@
+#include <iostream>
+#include <Windows.h>
+#include <process.h>
+
+using namespace std;
+
+volatile long l_count;
+
+//InterlockedIncrement(&l_count);
+//InterlockedDecrement(&l_count);
+//InterlockedExchangeAdd(&l_count, 1);
+//InterlockedExchange(&l_count, 123456);
+
+unsigned __stdcall ThreadFunA(void * pM)
+{
+    for(int i = 0; i != 500; ++i)
+    {
+        InterlockedIncrement(&l_count);
+        //++l_count;
+
+        Sleep(1);
+    }
+    return 0;
+}
+
+unsigned __stdcall ThreadFunB(void * pM)
+{
+    for (int i = 0; i != 500; ++i)
+    {
+        InterlockedIncrement(&l_count);
+        //++l_count;
+
+        Sleep(1);
+    }
+    return 0;
+}
+
+int main() {
+    
+    l_count = 0;
+
+    HANDLE hThreads[2];
+    hThreads[0] = (HANDLE)_beginthreadex(NULL, 0, ThreadFunA, NULL, 0, NULL);
+    hThreads[1] = (HANDLE)_beginthreadex(NULL, 0, ThreadFunB, NULL, 0, NULL);
+    WaitForMultipleObjects(2, hThreads, true, INFINITE);
+
+    cout << "l_count = " << l_count << endl;
+
+    return 0;
+}

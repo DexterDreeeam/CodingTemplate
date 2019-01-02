@@ -1,0 +1,36 @@
+//UDP_Socket
+
+//Client
+#include <winsock.h>
+#include <windows.h>
+#include <iostream>
+#include <string>
+#pragma comment(lib,"ws2_32.lib")
+
+using namespace std;
+int main() {
+	WSADATA data;
+	WORD v = MAKEWORD(2, 0);
+	WSAStartup(v, &data);
+	SOCKET sC = socket(AF_INET, SOCK_DGRAM, 0);
+	sockaddr_in addrC, addrS;
+	addrC.sin_family = AF_INET;
+	addrC.sin_port = htons(75);
+	addrC.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	//Client不需要绑定 IP和端口号
+	//::bind(sC, (sockaddr*)&addrC, sizeof(addrC));
+
+	cout << "Client Start." << endl;
+
+	char str[] = "Hello Server, I'm Client.";
+	char buff[30] = "";
+	int size = sizeof(addrC);
+	if (sendto(sC, str, sizeof(str), 0, (sockaddr*)&addrC, size) != 0) {
+		recvfrom(sC, buff, 30, 0, (sockaddr*)&addrS, &size);
+		cout << buff << endl;
+		closesocket(sC);
+		WSACleanup();
+	}
+	while (1);
+	return 0;
+}

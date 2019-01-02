@@ -1,0 +1,36 @@
+//求回文子序列个数
+
+#include <string>
+#include <iostream>
+
+using namespace std;
+
+typedef long long ll;
+ll f[59][59];
+string str;
+
+ll dfs(int i, int j) {
+	if (i > j) {
+		return 0;
+	}
+	if (i == j) {
+		f[i][j] = 1;
+		return f[i][j];
+	}
+	if (f[i][j] != 0) {
+		return f[i][j];
+	}
+	f[i][j] = dfs(i, j - 1) + dfs(i + 1, j) - dfs(i + 1, j - 1);
+	if (str[i] == str[j])
+		f[i][j] += dfs(i + 1, j - 1) + 1;
+	return f[i][j];
+}
+
+int main() {
+	
+	cin >> str;
+	int len = str.length();
+	cout << dfs(0, len - 1) << endl;
+	
+	return 0;
+}

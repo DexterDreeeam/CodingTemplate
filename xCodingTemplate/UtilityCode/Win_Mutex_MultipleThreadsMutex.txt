@@ -1,0 +1,53 @@
+#include <iostream>
+#include <Windows.h>
+#include <process.h>
+
+using namespace std;
+
+int l_count;
+HANDLE l_mutex;
+
+unsigned __stdcall ThreadFunA(void * pM)
+{
+    for(int i = 0; i != 500; ++i)
+    {
+        WaitForSingleObject(l_mutex, INFINITE);
+
+        ++l_count;
+        Sleep(1);
+
+        ReleaseMutex(l_mutex);
+    }
+    return 0;
+}
+
+unsigned __stdcall ThreadFunB(void * pM)
+{
+    for (int i = 0; i != 500; ++i)
+    {
+        WaitForSingleObject(l_mutex, INFINITE);
+
+        ++l_count;
+        Sleep(1);
+
+        ReleaseMutex(l_mutex);
+    }
+    return 0;
+}
+
+int main() 
+{
+    l_count = 0;
+    l_mutex = CreateMutex(NULL, false, NULL);
+
+    HANDLE hThreads[2];
+    hThreads[0] = (HANDLE)_beginthreadex(NULL, 0, ThreadFunA, NULL, 0, NULL);
+    hThreads[1] = (HANDLE)_beginthreadex(NULL, 0, ThreadFunB, NULL, 0, NULL);
+    WaitForMultipleObjects(2, hThreads, true, INFINITE);
+
+    cout << "l_count = " << l_count << endl;
+
+    CloseHandle(l_mutex);
+
+    return 0;
+}
